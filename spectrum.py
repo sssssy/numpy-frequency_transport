@@ -6,27 +6,42 @@ PI = 3.1415926
 
 class Spectrum():
 
-    def __init__(self, dims=2, radius=PI, sampling_rate=1000, name='unnamed spectrum'):
+    def __init__(self, dims=2, radius=10, sampling_rate=1000, name='unnamed spectrum'):
+        assert (dims==2), "only 2-d examples is supported yet."
         self.time = 0
         self.name = name
         self.dims = dims
         self.radius = radius
         self.sampling_rate = sampling_rate
         self.width = 2 * self.radius / self.sampling_rate
+        self.reset_matrix()
+        self.reset_Fmatrix()
+
+    def reset_matrix(self):
         self.matrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)))
+
+    def reset_Fmatrix(self):
         self.Fmatrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)))
 
-    def set_vcos(self):
-        cos_list = np.cos(np.arange(-self.radius, self.radius, 2*self.radius/1000.))
-        cos_list = np.expand_dims(cos_list, 0)
-        cos_matrix = np.repeat(cos_list, 1000, axis=0)
+    def set_cos(self):
+        cos_list = np.cos(np.arange(-self.radius, self.radius, 2*self.radius/self.sampling_rate))
+        normalized_cos_list = 255*(0.5+cos_list/2)
+        normalized_cos_list = normalized_cos_list.astype(np.uint8)
+        normalized_cos_list = np.expand_dims(normalized_cos_list, 0)
+        cos_matrix = np.repeat(normalized_cos_list, 1000, axis=0)
         self.matrix = cos_matrix
+
+    def set_rect(self, width, height):
+        w_sampling_radius = int(width/self.radius*self.sampling_rate/2)
+        h_sampling_radius = int(height/self.radius*self.sampling_rate/2)
+        w_sampling_start = int(self.sampling_rate/2 - w_sampling_radius)
+        h_sampling_start = int(self.sampling_rate/2 - h_sampling_radius)
+        self.reset_matrix()
+        self.matrix[h_sampling_start:h_sampling_start+h_sampling_radius*2,\
+            w_sampling_start:w_sampling_start+w_sampling_radius*2] = 1
     
-    def set_hcos(self):
-        cos_list = np.cos(np.arange(-self.radius, self.radius, 2*self.radius/1000.))
-        cos_list = np.expand_dims(cos_list, 1)
-        cos_matrix = np.repeat(cos_list, 1000, axis=1)
-        self.matrix = cos_matrix
+    def fourier(self):
+        self.Fmatrix = np.fft.fftshift(np.fft.fft2(self.matrix))
 
     def show(self):
         fig = plt.figure()
@@ -39,7 +54,7 @@ class Spectrum():
         plt.ylabel('x')
 
         ax1 = fig.add_subplot(122)
-        ax1 = imshow(self.Fmatrix)
+        ax1 = imshow(np.abs(self.Fmatrix))
         plt.title('fourier domain of '+self.name+": "+str(self.time))
         plt.xlabel('w_THETA')
         plt.ylabel('w_X')
