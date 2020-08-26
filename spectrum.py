@@ -31,14 +31,14 @@ class Spectrum():
         cos_matrix = np.repeat(normalized_cos_list, 1000, axis=0)
         self.matrix = cos_matrix
 
-    def set_rect(self, width, height):
+    def set_rect(self, width, height, value=255):
         w_sampling_radius = int(width/self.radius*self.sampling_rate/2)
         h_sampling_radius = int(height/self.radius*self.sampling_rate/2)
         w_sampling_start = int(self.sampling_rate/2 - w_sampling_radius)
         h_sampling_start = int(self.sampling_rate/2 - h_sampling_radius)
         self.reset_matrix()
         self.matrix[h_sampling_start:h_sampling_start+h_sampling_radius*2,\
-            w_sampling_start:w_sampling_start+w_sampling_radius*2] = 1
+            w_sampling_start:w_sampling_start+w_sampling_radius*2] = value
     
     def fourier(self):
         self.Fmatrix = np.fft.fftshift(np.fft.fft2(self.matrix))
@@ -54,7 +54,7 @@ class Spectrum():
         plt.ylabel('x')
 
         ax1 = fig.add_subplot(122)
-        ax1 = imshow(np.abs(self.Fmatrix))
+        ax1.imshow(np.abs(self.Fmatrix))
         plt.title('fourier domain of '+self.name+": "+str(self.time))
         plt.xlabel('w_THETA')
         plt.ylabel('w_X')
