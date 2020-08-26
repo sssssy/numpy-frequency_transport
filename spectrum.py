@@ -32,7 +32,7 @@ class Spectrum():
         normalized_cos_list = 255*(0.5+cos_list/2)
         normalized_cos_list = normalized_cos_list.astype(np.uint8)
         normalized_cos_list = np.expand_dims(normalized_cos_list, 0)
-        cos_matrix = np.repeat(normalized_cos_list, 1000, axis=0)
+        cos_matrix = np.repeat(normalized_cos_list, self.sampling_rate, axis=0)
         del self.matrix
         del self.Fmatrix
         self.matrix = cos_matrix
