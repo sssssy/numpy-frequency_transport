@@ -19,13 +19,10 @@ class Spectrum():
         self.sampling_rate = sampling_rate
         self.width = 2 * self.radius / self.sampling_rate
         self.init_matrix()
-        self.init_Fmatrix()
+        self.fourier()
 
     def init_matrix(self):
         self.matrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)))
-
-    def init_Fmatrix(self):
-        self.Fmatrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)))
 
     def set_cos(self):
         cos_list = np.cos(np.arange(-self.radius, self.radius, 2*self.radius/self.sampling_rate))
