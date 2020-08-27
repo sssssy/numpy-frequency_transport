@@ -7,7 +7,7 @@ from ray import *
 if __name__ == '__main__':
     # lena = cv2.imread('lena.jpg', cv2.IMREAD_GRAYSCALE)
 
-    s = Spectrum(sampling_rate=100, name='cos')
+    s = Spectrum(sampling_rate=100)
     p = np.array([0,0,0])
     d = np.array([0,0,1])
     r = Ray(p, d, s)

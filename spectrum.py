@@ -11,7 +11,7 @@ class Spectrum():
     matrix[x, theta]
     '''
 
-    def __init__(self, dims=2, radius=10, sampling_rate=100, name='unnamed spectrum'):
+    def __init__(self, dims=2, radius=10, sampling_rate=100, name='unnamed'):
         assert (dims==2), "only 2-d examples is supported yet."
         self.time = 0
         self.name = name
@@ -21,16 +21,18 @@ class Spectrum():
         self.width = 2 * self.radius / self.sampling_rate
         self.init_matrix()
         self.init_Fmatrix()
+        self.new_Fmatrix = None
         self.lastop = 'init'
 
     def init_matrix(self):
         self.matrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)))
 
     def init_Fmatrix(self):
-        self.Fmatrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)))
+        self.Fmatrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)), dtype=complex)
 
     def set_cos(self):
         self.lastop = 'set_cos'
+        self.name += '_cos'
         cos_list = np.cos(np.arange(-self.radius, self.radius, 2*self.radius/self.sampling_rate))
         normalized_cos_list = 255*(0.5+cos_list/2)
         normalized_cos_list = normalized_cos_list.astype(np.uint8)
@@ -44,6 +46,7 @@ class Spectrum():
 
     def set_rect(self, width, height, value=255):
         self.lastop = 'set_rect'
+        self.name += '_rect'
         w_sampling_radius = int(width/self.radius*self.sampling_rate/2)
         h_sampling_radius = int(height/self.radius*self.sampling_rate/2)
         w_sampling_start = int(self.sampling_rate/2 - w_sampling_radius)
