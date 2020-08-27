@@ -1,6 +1,7 @@
 import numpy as np
 from pylab import *
 import matplotlib.pyplot as plt
+import gc
 
 PI = 3.1415926
 UNDEFINED = 0
@@ -19,12 +20,17 @@ class Spectrum():
         self.sampling_rate = sampling_rate
         self.width = 2 * self.radius / self.sampling_rate
         self.init_matrix()
-        self.fourier()
+        self.init_Fmatrix()
+        self.lastop = 'init'
 
     def init_matrix(self):
         self.matrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)))
 
+    def init_Fmatrix(self):
+        self.Fmatrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)))
+
     def set_cos(self):
+        self.lastop = 'set_cos'
         cos_list = np.cos(np.arange(-self.radius, self.radius, 2*self.radius/self.sampling_rate))
         normalized_cos_list = 255*(0.5+cos_list/2)
         normalized_cos_list = normalized_cos_list.astype(np.uint8)
@@ -32,19 +38,22 @@ class Spectrum():
         cos_matrix = np.repeat(normalized_cos_list, self.sampling_rate, axis=0)
         del self.matrix
         del self.Fmatrix
+        gc.collect()
         self.matrix = cos_matrix
         self.fourier()
 
     def set_rect(self, width, height, value=255):
+        self.lastop = 'set_rect'
         w_sampling_radius = int(width/self.radius*self.sampling_rate/2)
         h_sampling_radius = int(height/self.radius*self.sampling_rate/2)
         w_sampling_start = int(self.sampling_rate/2 - w_sampling_radius)
         h_sampling_start = int(self.sampling_rate/2 - h_sampling_radius)
         del self.matrix
         del self.Fmatrix
+        gc.collect()
         self.init_matrix()
-        self.matrix[h_sampling_start:h_sampling_start+h_sampling_radius*2,\
-            w_sampling_start:w_sampling_start+w_sampling_radius*2] = value
+        self.matrix[w_sampling_start:w_sampling_start+w_sampling_radius*2,\
+            h_sampling_start:h_sampling_start+h_sampling_radius*2] = value
         self.fourier()
     
     def fourier(self):
@@ -65,22 +74,3 @@ class Spectrum():
         res = np.interp(j, [j_floor, j_ceil], [res_floor, res_ceil])
 
         return res
-
-    def show(self):
-        fig = plt.figure()
-        plt.subplots_adjust(wspace=0.5, hspace=0)
-
-        ax0 = fig.add_subplot(121)
-        ax0.imshow(self.matrix)
-        plt.title('spectrum of '+self.name+": "+str(self.time))
-        plt.xlabel('theta (1/rad)')
-        plt.ylabel('x')
-
-        ax1 = fig.add_subplot(122)
-        ax1.imshow(np.abs(self.Fmatrix))
-        plt.title('fourier domain of '+self.name+": "+str(self.time))
-        plt.xlabel('w_THETA')
-        plt.ylabel('w_X')
-
-        plt.show()
-
