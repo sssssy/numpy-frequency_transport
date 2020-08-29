@@ -104,17 +104,17 @@ class Ray(Spectrum):
         gc.collect()
         self.matrix = new_matrix
         self.fourier()
-
+  
     def bsdf(self):
         pass
-        
+    
     def reflect(self):
         pass
 
     def visualize(self):
         fig = plt.figure()
         plt.suptitle(
-            'Spectrum of "{}" after {}, time = {}\nSource: {}, Direction: {}'\
+            'Spectrum of "{}(2d)" after {}, time = {}\nSource: {}, Direction: {}'\
                 .format(self.name, self.lastop, self.time, self.point, self.direction)
         )
         plt.subplots_adjust(wspace=0.5, hspace=0)
@@ -136,5 +136,4 @@ class Ray(Spectrum):
             plt.ylabel('w_THETA')
 
         # plt.show()
-        plt.savefig('{}_{}'.format(self.name, self.time))
-
+        plt.savefig('{}d_{}_{}'.format(self.dims, self.name, self.time))

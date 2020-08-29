@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.interpolate import interpn
 from pylab import *
 import matplotlib.pyplot as plt
 import gc
@@ -11,8 +12,8 @@ class Spectrum():
     matrix[x, theta]
     '''
 
-    def __init__(self, dims=2, radius=10, sampling_rate=100, name='unnamed'):
-        assert (dims==2), "only 2-d examples is supported yet."
+    def __init__(self, dims=2, radius=10, sampling_rate=50, name='unnamed'):
+        assert(dims==2), 'error, this is a 2d configuration'
         self.time = 0
         self.name = name
         self.dims = dims
@@ -58,9 +59,9 @@ class Spectrum():
         self.matrix[w_sampling_start:w_sampling_start+w_sampling_radius*2,\
             h_sampling_start:h_sampling_start+h_sampling_radius*2] = value
         self.fourier()
-    
+
     def fourier(self):
-        self.Fmatrix = np.fft.fftshift(np.fft.fft2(self.matrix))
+        self.Fmatrix = np.fft.fftshift(np.fft.fftn(self.matrix))
 
     def bilinear(self, m, i, j):
         i = i+self.sampling_rate/2
@@ -69,11 +70,12 @@ class Spectrum():
         i_ceil = int(np.ceil(i))
         j_floor = int(np.floor(j))
         j_ceil = int(np.ceil(j))
-        if not all([x < self.sampling_rate and x >= 0 
-            for x in (i_floor, i_ceil, j_floor, j_ceil)]): # TODO: make more accurate
-            return UNDEFINED
-        res_floor = np.interp(i, [i_floor, i_ceil], [m[i_floor, j_floor], m[i_ceil, j_floor]])
-        res_ceil = np.interp(i, [i_floor, i_ceil], [m[i_floor, j_ceil], m[i_ceil, j_ceil]])
-        res = np.interp(j, [j_floor, j_ceil], [res_floor, res_ceil])
 
+        if not all([x < self.sampling_rate and x >= 0 
+            for x in (i_floor, i_ceil, j_floor, j_ceil)
+        ]): # TODO: make more accurate
+            return UNDEFINED
+
+        coords = tuple(np.arange(self.sampling_rate) for i in range(self.dims))
+        res = interpn(coords, m, [i, j])
         return res
