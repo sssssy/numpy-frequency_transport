@@ -12,7 +12,8 @@ class Spectrum4d():
     matrix[x, theta]
     '''
 
-    def __init__(self, dims=4, radius=10, sampling_rate=20, name='unnamed'):
+    def __init__(self, dims=4, radius=10, sampling_rate=20,
+            fake_bilinear=False,name='unnamed'):
         assert(dims==4), 'error, this is a 4d configuration'
         self.time = 0
         self.name = name
@@ -24,6 +25,7 @@ class Spectrum4d():
         self.init_Fmatrix()
         self.new_Fmatrix = None
         self.lastop = 'init'
+        self.fake_bilinear = fake_bilinear
 
     def init_matrix(self):
         self.matrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)))
@@ -86,5 +88,8 @@ class Spectrum4d():
             return UNDEFINED
 
         coords = tuple(np.arange(self.sampling_rate) for i in range(self.dims))
-        res = interpn(coords, m, [i, j, k, l])
+        if self.fake_bilinear:
+            res = m[i_floor, j_floor, k_ceil, l_ceil]
+        else:
+            res = interpn(coords, m, [i, j, k, l])
         return res
