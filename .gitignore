@@ -2,6 +2,9 @@
 images/
 *.jpg
 *.png
+*.exe
+*.zip
+fftw-3.3.5-dll64/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
