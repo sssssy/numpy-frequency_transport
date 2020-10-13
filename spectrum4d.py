@@ -43,7 +43,7 @@ class Spectrum4d():
         repeat the same in y & phi dims.
         '''
         self.lastop = 'set_rect4d'
-        self.name += '_rect4d'
+        # self.name += '_rect4d'
         w_sampling_radius = int(width/self.radius*self.sampling_rate/2)
         h_sampling_radius = int(height/self.radius*self.sampling_rate/2)
         w_sampling_start = int(self.sampling_rate/2 - w_sampling_radius)
