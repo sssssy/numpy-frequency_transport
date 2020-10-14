@@ -50,13 +50,13 @@ class Ray4d(Covariance):
         if mode == 'gaussian':
             # init array
             coord = np.linspace(-1, 1, self.sampling_rate*2)
-            dist = stats.norm(0, 0.2).pdf(coord)
+            dist = stats.norm(0, 0.3).pdf(coord)
             dist = np.expand_dims(dist, axis=0)
             bsdf = np.repeat(dist, self.sampling_rate, 0)
 
             # # shear for half vector
-            # for i in range(0, self.sampling_rate):
-            #     bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
+            for i in range(0, self.sampling_rate):
+                bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
 
             return bsdf[:, self.sampling_rate//2:self.sampling_rate//2*3]
 

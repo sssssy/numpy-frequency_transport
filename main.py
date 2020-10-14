@@ -10,18 +10,18 @@ if __name__ == '__main__':
     # lena = cv2.imread('lena.jpg', cv2.IMREAD_GRAYSCALE)
 
     s = Spectrum4d(sampling_rate=40,
-            name='gaussian_unrolled_bsdf_test',
+            name='set_cos_diffuse',
             fake_bilinear=True)
     s = Covariance(s)
-    print('>>> 4D Light Field. name: {}'.format(s.name))
-    print('>>> fake_bilinear = {}'.format(s.fake_bilinear))
     p = np.array([0,0,0])
     d = np.array([0,0,1])
     r = Ray4d(p, d, s, bsdf_mode='gaussian')
-    # r.matrix = lena
-    # r.set_cos()
+    print('>>> 4D Light Field. name: {}'.format(s.name))
+    print('>>> fake_bilinear = {}'.format(s.fake_bilinear))
+
     t0 = clock()
-    r.set_rect(4, 2)
+    r.set_cos()
+    # r.set_rect(4, 2)
     t1 = clock()
     print('\t>>  {}. {} \ttime: {:.4f}'.format(r.time, r.lastop, t1-t0))
     r.visualize()

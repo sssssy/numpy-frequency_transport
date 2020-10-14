@@ -34,11 +34,32 @@ class Spectrum4d():
         self.Fmatrix = np.zeros(tuple(self.sampling_rate for i in range(self.dims)), dtype=complex)
 
     def set_cos(self):
-        pass
+        '''
+        [x, y, theta, phi] = [~, ~, cos, ~]
+        ~ represents a uniform distribution, 
+        i.e. same in every channel of this dimension.
+        '''
+        self.lastop = 'set_cos_4d'
+        
+        coord = np.linspace(0, PI * 2, self.sampling_rate)
+        dist = -np.cos(coord)
+        dist = np.expand_dims(dist, axis=(0, 1, 3))
+        dist = np.repeat(dist, self.sampling_rate, 0)
+        dist = np.repeat(dist, self.sampling_rate, 1)
+        dist = np.repeat(dist, self.sampling_rate, 3)
+
+        del self.matrix
+        del self.Fmatrix
+        self.init_matrix()
+
+        self.matrix = dist
+        self.fourier()
+        
     
     def set_rect(self, width, height, value=255):
         '''
         4d condition
+        [x, y, theta, phi] = [rect, ~, rect, ~]
         only set x, theta dims,
         repeat the same in y & phi dims.
         '''
@@ -50,7 +71,7 @@ class Spectrum4d():
         h_sampling_start = int(self.sampling_rate/2 - h_sampling_radius)
         del self.matrix
         del self.Fmatrix
-        gc.collect()
+        # gc.collect()
         self.init_matrix()
         self.matrix[w_sampling_start:w_sampling_start+w_sampling_radius*2,
             :,
