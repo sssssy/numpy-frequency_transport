@@ -9,3 +9,5 @@ class Covariance(Spectrum4d):
             sampling_rate=s.sampling_rate, name=s.name, 
             fake_bilinear = s.fake_bilinear)
         self.m = np.identity(4)
+
+    

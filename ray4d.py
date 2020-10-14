@@ -1,34 +1,70 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from copy import deepcopy
+from scipy import stats
 
-from spectrum4d import *
+from covariance import *
 
-class Ray4d(Spectrum4d):
+class Ray4d(Covariance):
 
-    def __init__(self, p, d, s):
-        super(Ray4d, self).__init__(dims = s.dims, radius = s.radius, 
-            sampling_rate=s.sampling_rate, name=s.name, 
-            fake_bilinear = s.fake_bilinear)
+    def __init__(self, p, d, s, bsdf_mode):
+
+        super(Ray4d, self).__init__(s)
         self.point = p
         self.direction = d
         self.theta_in = 0.5
         self.theta_out = 1.0
-        self.bsdf = self.init_bsdf(mode = 'white')
+        self.bsdf = self.init_bsdf(bsdf_mode)
 
     def init_bsdf(self, mode):
         
         if mode == 'white':
-            bsdf = np.random.normal(0, 1,
-                [self.sampling_rate, self.sampling_rate])
+            # init array
+            dist = np.random.normal(0, 0.3,
+                [1, self.sampling_rate])
+            bsdf = np.repeat(dist, self.sampling_rate, 0)
             bsdf = bsdf / np.max(np.abs(bsdf)) / 2 + 0.5
-            return bsdf
+            
+            # shear for half vector
+            for i in range(0, self.sampling_rate):
+                bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
+
+            return bsdf[:, self.sampling_rate//2:self.sampling_rate//2*3]
+
+        if mode == 'linspace':
+            # init array
+            dist = np.linspace(0, 1, self.sampling_rate)
+            dist = np.expand_dims(dist, axis=0)
+            bsdf = np.repeat(dist, self.sampling_rate, 0)
+            bsdf = bsdf / np.max(np.abs(bsdf)) / 2 + 0.5
+            
+            # shear for half vector
+            for i in range(0, self.sampling_rate):
+                bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
+
+            return bsdf[:, self.sampling_rate//2:self.sampling_rate//2*3]
 
         if mode == 'cos':
             pass
 
         if mode == 'gaussian':
-            pass
+            # init array
+            coord = np.linspace(-1, 1, self.sampling_rate*2)
+            dist = stats.norm(0, 0.2).pdf(coord)
+            dist = np.expand_dims(dist, axis=0)
+            bsdf = np.repeat(dist, self.sampling_rate, 0)
+
+            # # shear for half vector
+            # for i in range(0, self.sampling_rate):
+            #     bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
+
+            return bsdf[:, self.sampling_rate//2:self.sampling_rate//2*3]
+
+    def visualize_bsdf(self):
+
+        fig = plt.figure()
+        plt.imshow(self.bsdf)
+        plt.savefig('images/{}d_{}_bsdf'.format(self.dims, self.name))
 
     def travel(self, d):
         '''
@@ -334,20 +370,28 @@ class Ray4d(Spectrum4d):
         plt.subplots_adjust(wspace=0.5, hspace=0)
 
         ax0 = fig.add_subplot(121)
-        ax0.imshow(np.transpose(self.matrix[:,
+        ax0.imshow(np.transpose(self.matrix[
+            :,
             self.sampling_rate//2,
             :,
-            self.sampling_rate//2]), origin='lower')
+            self.sampling_rate // 2,
+            ]), origin='lower')
         plt.xlabel('x')
+        # plt.ylabel('y')
         plt.ylabel('theta (1/rad)')
+        # plt.ylabel('phi (1/rad)')
 
         ax1 = fig.add_subplot(122)
-        ax1.imshow(np.transpose(np.abs(self.Fmatrix[:,
+        ax1.imshow(np.transpose(np.abs(self.Fmatrix[
+            :,
             self.sampling_rate//2,
             :,
-            self.sampling_rate//2])), origin='lower')
+            self.sampling_rate // 2,
+            ])), origin='lower')
         plt.xlabel('w_X')
+        # plt.ylabel('w_Y')
         plt.ylabel('w_THETA')
+        # plt.ylabel('w_PHI')
 
         # if self.new_Fmatrix is not None:
         #     ax2 = fig.add_subplot(133)
