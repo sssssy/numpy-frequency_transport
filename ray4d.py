@@ -15,6 +15,7 @@ class Ray4d(Covariance):
         self.theta_in = 0.5
         self.theta_out = 1.0
         self.bsdf = self.init_bsdf(bsdf_mode)
+        self.set_eye()
 
     def init_bsdf(self, mode):
         
@@ -132,6 +133,9 @@ class Ray4d(Covariance):
         self.matrix = new_matrix
         self.fourier()
 
+        self.travel_cov(d)
+        self.print_cov()
+
     def reparameter(self, n):
         '''
         4d condition
@@ -193,6 +197,11 @@ class Ray4d(Covariance):
         self.matrix = new_matrix
         self.fourier()
 
+        self.rotation_cov(self.alpha)
+        self.print_cov()
+        self.scale_cov(1 / cos_alpha)
+        self.print_cov()
+
     def curvature(self, K):
         '''
         4d condition
@@ -248,6 +257,9 @@ class Ray4d(Covariance):
         self.matrix = new_matrix
         self.fourier()
 
+        self.curvature_cov(K)
+        self.print_cov()
+
     def mirror_reflection(self):
         
         self.time += 1
@@ -287,6 +299,9 @@ class Ray4d(Covariance):
         self.matrix = new_matrix
         self.fourier()
 
+        self.mirror_reflection_cov()
+        self.print_cov()
+
     def cosine(self):
 
         self.time += 1
@@ -303,10 +318,10 @@ class Ray4d(Covariance):
                         theta = k-self.sampling_rate/2
                         phi = l-self.sampling_rate/2
 
-                        i_ = round(x * np.cos(theta + self.theta_in)) + self.sampling_rate//2
-                        j_ = round(y * np.cos(phi + self.theta_in)) + self.sampling_rate//2
-                        k_ = round(theta * np.cos(theta + self.theta_in)) + self.sampling_rate//2
-                        l_ = round(phi * np.cos(phi + self.theta_in)) + self.sampling_rate//2
+                        i_ = round(x * max(0, np.cos(theta + self.theta_in))) + self.sampling_rate//2
+                        j_ = round(y * max(0, np.cos(phi + self.theta_in))) + self.sampling_rate//2
+                        k_ = round(theta * max(0, np.cos(theta + self.theta_in))) + self.sampling_rate//2
+                        l_ = round(phi * max(0, np.cos(phi + self.theta_in))) + self.sampling_rate//2
 
                         if not all([_ < self.sampling_rate and _ >= 0
                             for _ in (i_, j_, k_, l_)
@@ -325,6 +340,9 @@ class Ray4d(Covariance):
         del self.matrix
         self.matrix = new_matrix
         self.fourier()
+
+        self.cosine_cov(self.theta_in)
+        self.print_cov()
 
     def bsdf_conv(self):
 
