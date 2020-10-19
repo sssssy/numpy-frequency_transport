@@ -12,10 +12,10 @@ class Ray4d(Covariance):
         super(Ray4d, self).__init__(s)
         self.point = p
         self.direction = d
-        self.theta_in = 0.5
+        self.theta_in = 0.5 # PI = 3.1415926
         self.theta_out = 1.0
         self.bsdf = self.init_bsdf(bsdf_mode)
-        self.set_eye()
+        # self.set_eye()
 
     def init_bsdf(self, mode):
         

@@ -54,8 +54,6 @@ class Spectrum4d():
 
         self.matrix = dist
         self.fourier()
-
-        self.get_cov(self.matrix)
     
     def set_rect(self, width, height, value=255):
         '''
@@ -80,8 +78,6 @@ class Spectrum4d():
             h_sampling_start:h_sampling_start+h_sampling_radius*2,
             :] = value
         self.fourier()
-
-        self.get_cov(self.matrix)
 
     def fourier(self):
         self.Fmatrix = np.fft.fftshift(np.fft.fftn(self.matrix, axes=(0,1,2,3)))

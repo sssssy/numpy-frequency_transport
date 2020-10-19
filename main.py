@@ -17,7 +17,7 @@ if __name__ == '__main__':
     d = np.array([0,0,1])
     r = Ray4d(p, d, s, bsdf_mode='gaussian')
     print('>>> 4D Light Field. name: {}'.format(s.name))
-    print('>>> fake_bilinear = {}'.format(s.fake_bilinear))
+    print('>>> fake_bilinear = {}\n'.format(s.fake_bilinear))
 
     t0 = clock()
     r.set_cos()
