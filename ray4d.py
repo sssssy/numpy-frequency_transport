@@ -363,6 +363,12 @@ class Ray4d(Covariance):
 
     def bsdf_conv(self):
 
+        def integrate_bsdf(i, j, k, l):
+            theta_sum = 0
+            for theta_in in range(self.sampling_rate):
+                theta_sum += self.matrix[i, j, theta_in, l] * self.bsdf[theta_in, k]
+            return theta_sum
+
         self.time += 1
         self.lastop = 'bsdf_conv_4d'
 
@@ -376,7 +382,7 @@ class Ray4d(Covariance):
                         y = j-self.sampling_rate//2
                         theta = k-self.sampling_rate//2
                         phi = l-self.sampling_rate//2
-                        new_matrix[i, j, k, l] = self.integrate_bsdf(
+                        new_matrix[i, j, k, l] = integrate_bsdf(
                             i,
                             j,
                             k,
@@ -387,11 +393,8 @@ class Ray4d(Covariance):
         self.matrix = new_matrix
         self.fourier()
 
-    def integrate_bsdf(self, i, j, k, l):
-        theta_sum = 0
-        for theta_in in range(self.sampling_rate):
-            theta_sum += self.matrix[i, j, theta_in, l] * self.bsdf[theta_in, k]
-        return theta_sum
+        self.bsdf_cov()
+        self.print_cov()
 
     def visualize(self):
         '''
