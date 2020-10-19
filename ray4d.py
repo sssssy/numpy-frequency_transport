@@ -28,9 +28,9 @@ class Ray4d(Covariance):
             
             # shear for half vector
             for i in range(0, self.sampling_rate):
-                bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
+                bsdf[i, :] = np.roll(bsdf[i, :], self.radius-i)
 
-            return bsdf[:, self.sampling_rate//2:self.sampling_rate//2*3]
+            return bsdf[:, self.radius:self.radius*3]
 
         if mode == 'linspace':
             # init array
@@ -41,9 +41,9 @@ class Ray4d(Covariance):
             
             # shear for half vector
             for i in range(0, self.sampling_rate):
-                bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
+                bsdf[i, :] = np.roll(bsdf[i, :], self.radius-i)
 
-            return bsdf[:, self.sampling_rate//2:self.sampling_rate//2*3]
+            return bsdf[:, self.radius:self.radius*3]
 
         if mode == 'cos':
             pass
@@ -57,9 +57,9 @@ class Ray4d(Covariance):
 
             # # shear for half vector
             for i in range(0, self.sampling_rate):
-                bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
+                bsdf[i, :] = np.roll(bsdf[i, :], self.radius-i)
 
-            return bsdf[:, self.sampling_rate//2:self.sampling_rate//2*3]
+            return bsdf[:, self.radius:self.radius*3]
 
         if mode == 'ggx':
             def ggx_dist(a, m):
@@ -74,9 +74,9 @@ class Ray4d(Covariance):
 
             # # shear for half vector
             for i in range(0, self.sampling_rate):
-                bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
+                bsdf[i, :] = np.roll(bsdf[i, :], self.radius-i)
 
-            return bsdf[:, self.sampling_rate//2:self.sampling_rate//2*3]
+            return bsdf[:, self.radius:self.radius*3]
 
     def visualize_bsdf(self):
 
@@ -104,10 +104,10 @@ class Ray4d(Covariance):
                         theta = k-self.sampling_rate/2
                         phi = l - self.sampling_rate / 2
 
-                        i_ = round(x - d * theta) + self.sampling_rate//2
-                        j_ = round(y - d * phi) + self.sampling_rate//2
-                        k_ = round(theta) + self.sampling_rate//2
-                        l_ = round(phi) + self.sampling_rate//2
+                        i_ = round(x - d * theta) + self.radius
+                        j_ = round(y - d * phi) + self.radius
+                        k_ = round(theta) + self.radius
+                        l_ = round(phi) + self.radius
 
                         if not all([_ < self.sampling_rate and _ >= 0
                             for _ in (i_, j_, k_, l_)
@@ -177,10 +177,10 @@ class Ray4d(Covariance):
                         theta = k-self.sampling_rate/2
                         phi = l - self.sampling_rate / 2
                         
-                        i_ = round(x * cos_alpha - y * sin_alpha) + self.sampling_rate//2
-                        j_ = round(x * sin_alpha / cos_alpha + y) + self.sampling_rate//2
-                        k_ = round(theta * cos_alpha - phi * sin_alpha) + self.sampling_rate//2
-                        l_ = round(theta * sin_alpha + phi * cos_alpha) + self.sampling_rate//2
+                        i_ = round(x * cos_alpha - y * sin_alpha) + self.radius
+                        j_ = round(x * sin_alpha / cos_alpha + y) + self.radius
+                        k_ = round(theta * cos_alpha - phi * sin_alpha) + self.radius
+                        l_ = round(theta * sin_alpha + phi * cos_alpha) + self.radius
 
                         if not all([_ < self.sampling_rate and _ >= 0
                             for _ in (i_, j_, k_, l_)
@@ -238,10 +238,10 @@ class Ray4d(Covariance):
                         theta = k-self.sampling_rate/2
                         phi = l-self.sampling_rate/2
 
-                        i_ = round(x) + self.sampling_rate//2
-                        j_ = round(y) + self.sampling_rate//2
-                        k_ = round(theta + K * (x + self.alpha)) + self.sampling_rate//2
-                        l_ = round(phi + K * y) + self.sampling_rate//2
+                        i_ = round(x) + self.radius
+                        j_ = round(y) + self.radius
+                        k_ = round(theta + K * (x + self.alpha)) + self.radius
+                        l_ = round(phi + K * y) + self.radius
 
                         if not all([_ < self.sampling_rate and _ >= 0
                             for _ in (i_, j_, k_, l_)
@@ -293,10 +293,10 @@ class Ray4d(Covariance):
                         theta = k-self.sampling_rate/2
                         phi = l-self.sampling_rate/2
 
-                        i_ = round(x) + self.sampling_rate//2
-                        j_ = round(y) + self.sampling_rate//2
-                        k_ = round(-theta) + self.sampling_rate//2
-                        l_ = round(-phi) + self.sampling_rate//2
+                        i_ = round(x) + self.radius
+                        j_ = round(y) + self.radius
+                        k_ = round(-theta) + self.radius
+                        l_ = round(-phi) + self.radius
 
                         if not all([_ < self.sampling_rate and _ >= 0
                             for _ in (i_, j_, k_, l_)
@@ -335,10 +335,10 @@ class Ray4d(Covariance):
                         theta = k-self.sampling_rate/2
                         phi = l-self.sampling_rate/2
 
-                        i_ = round(x * max(0, np.cos(theta + self.theta_in))) + self.sampling_rate//2
-                        j_ = round(y * max(0, np.cos(phi + self.theta_in))) + self.sampling_rate//2
-                        k_ = round(theta * max(0, np.cos(theta + self.theta_in))) + self.sampling_rate//2
-                        l_ = round(phi * max(0, np.cos(phi + self.theta_in))) + self.sampling_rate//2
+                        i_ = round(x * max(0, np.cos(theta + self.theta_in))) + self.radius
+                        j_ = round(y * max(0, np.cos(phi + self.theta_in))) + self.radius
+                        k_ = round(theta * max(0, np.cos(theta + self.theta_in))) + self.radius
+                        l_ = round(phi * max(0, np.cos(phi + self.theta_in))) + self.radius
 
                         if not all([_ < self.sampling_rate and _ >= 0
                             for _ in (i_, j_, k_, l_)
@@ -378,10 +378,10 @@ class Ray4d(Covariance):
             for j in range(self.sampling_rate):
                 for k in range(self.sampling_rate):
                     for l in range(self.sampling_rate):
-                        x = i-self.sampling_rate//2
-                        y = j-self.sampling_rate//2
-                        theta = k-self.sampling_rate//2
-                        phi = l-self.sampling_rate//2
+                        x = i-self.radius
+                        y = j-self.radius
+                        theta = k-self.radius
+                        phi = l-self.radius
                         new_matrix[i, j, k, l] = integrate_bsdf(
                             i,
                             j,
@@ -410,9 +410,9 @@ class Ray4d(Covariance):
         ax0 = fig.add_subplot(121)
         ax0.imshow(np.transpose(self.matrix[
             :,
-            self.sampling_rate//2,
+            self.radius,
             :,
-            self.sampling_rate // 2,
+            self.radius,
             ]), origin='lower')
         plt.xlabel('x')
         # plt.ylabel('y')
@@ -422,9 +422,9 @@ class Ray4d(Covariance):
         ax1 = fig.add_subplot(122)
         ax1.imshow(np.transpose(np.abs(self.Fmatrix[
             :,
-            self.sampling_rate//2,
+            self.radius,
             :,
-            self.sampling_rate // 2,
+            self.radius,
             ])), origin='lower')
         plt.xlabel('w_X')
         # plt.ylabel('w_Y')
@@ -434,9 +434,9 @@ class Ray4d(Covariance):
         # if self.new_Fmatrix is not None:
         #     ax2 = fig.add_subplot(133)
         #     ax2.imshow(np.transpose(np.abs(self.new_Fmatrix[:,
-        #         self.sampling_rate//2,
+        #         self.radius,
         #         :,
-        #         self.sampling_rate//2])), origin='lower')
+        #         self.radius])), origin='lower')
         #     plt.xlabel('w_X')
         #     plt.ylabel('w_THETA')
 

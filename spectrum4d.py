@@ -64,8 +64,8 @@ class Spectrum4d():
         self.lastop = 'set_rect4d'
         # self.name += '_rect4d'
 
-        w_sampling_start = self.sampling_rate // 2 - width // 2
-        h_sampling_start = self.sampling_rate // 2 - height // 2
+        w_sampling_start = self.radius - width // 2
+        h_sampling_start = self.radius - height // 2
         
         del self.matrix
         del self.Fmatrix
