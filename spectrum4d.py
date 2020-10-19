@@ -12,15 +12,14 @@ class Spectrum4d():
     matrix[x, theta]
     '''
 
-    def __init__(self, dims=4, radius=10, sampling_rate=20,
+    def __init__(self, dims=4, sampling_rate=20,
             fake_bilinear=False,name='unnamed'):
         assert(dims==4), 'error, this is a 4d configuration'
         self.time = 0
         self.name = name
         self.dims = dims
-        self.radius = radius
         self.sampling_rate = sampling_rate
-        self.width = 2 * self.radius / self.sampling_rate
+        self.radius = self.sampling_rate // 2
         self.init_matrix()
         self.init_Fmatrix()
         self.new_Fmatrix = None
@@ -64,18 +63,17 @@ class Spectrum4d():
         '''
         self.lastop = 'set_rect4d'
         # self.name += '_rect4d'
-        w_sampling_radius = int(width/self.radius*self.sampling_rate/2)
-        h_sampling_radius = int(height/self.radius*self.sampling_rate/2)
-        w_sampling_start = int(self.sampling_rate/2 - w_sampling_radius)
-        h_sampling_start = int(self.sampling_rate / 2 - h_sampling_radius)
+
+        w_sampling_start = self.sampling_rate // 2 - width // 2
+        h_sampling_start = self.sampling_rate // 2 - height // 2
         
         del self.matrix
         del self.Fmatrix
         # gc.collect()
         self.init_matrix()
-        self.matrix[w_sampling_start:w_sampling_start+w_sampling_radius*2,
+        self.matrix[w_sampling_start:w_sampling_start + width,
             :,
-            h_sampling_start:h_sampling_start+h_sampling_radius*2,
+            h_sampling_start:h_sampling_start + height,
             :] = value
         self.fourier()
 
