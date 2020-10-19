@@ -12,7 +12,7 @@ class Ray4d(Covariance):
         super(Ray4d, self).__init__(s)
         self.point = p
         self.direction = d
-        self.theta_in = 0.5 # PI = 3.1415926
+        self.theta_in = 0.5 # w.r.t. PI = 3.1415926
         self.theta_out = 1.0
         self.bsdf = self.init_bsdf(bsdf_mode)
         # self.set_eye()
@@ -51,7 +51,24 @@ class Ray4d(Covariance):
         if mode == 'gaussian':
             # init array
             coord = np.linspace(-1, 1, self.sampling_rate*2)
-            dist = stats.norm(0, 0.3).pdf(coord)
+            dist = stats.norm(0, 0.3).pdf(coord) # 0.3 for diffuse and 0.1 for specular
+            dist = np.expand_dims(dist, axis=0)
+            bsdf = np.repeat(dist, self.sampling_rate, 0)
+
+            # # shear for half vector
+            for i in range(0, self.sampling_rate):
+                bsdf[i, :] = np.roll(bsdf[i, :], self.sampling_rate//2-i)
+
+            return bsdf[:, self.sampling_rate//2:self.sampling_rate//2*3]
+
+        if mode == 'ggx':
+            def ggx_dist(a, m):
+                return a ** 2 * np.cos(m) / (PI * (np.cos(m) ** 4) * ((a ** 2) + np.tan(m) ** 2) ** 2)
+            def ggx_dist_tr(a, m):
+                return a**2/(PI*((m**2)))
+            # init array
+            coord = np.linspace(-1, 1, self.sampling_rate*2)
+            dist = ggx_dist(0.2, coord) # 0.5 for diffuse and 0.2 for specular
             dist = np.expand_dims(dist, axis=0)
             bsdf = np.repeat(dist, self.sampling_rate, 0)
 
